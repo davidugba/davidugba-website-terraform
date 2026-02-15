@@ -6,13 +6,18 @@ Production AWS website infrastructure for davidugba.com managed with Terraform.
 
 ![Architecture Diagram (PNG)](docs/architecture.png)
 
+*Figure 1: AWS infrastructure architecture for davidugba.com*
+
+<details>
+<summary>📐 View Mermaid source code (editable)</summary>
+
 ```mermaid
 flowchart LR
 	user[User Browser] -->|HTTPS| cf[CloudFront Distribution]
 	cf -->|Origin: S3 Website Endpoint| s3www[S3 Bucket: www.davidugba.com]
 	cf -->|Origin: S3 Website Endpoint| s3root[S3 Bucket: davidugba.com]
 	r53[Route 53 Hosted Zone] -->|A/AAAA records| cf
-	acm[ACM Certificate (us-east-1)] -->|TLS| cf
+	acm[ACM Certificate] -->|TLS| cf
 ```
 
 Mermaid source: docs/architecture.mmd
