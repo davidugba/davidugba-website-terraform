@@ -10,7 +10,7 @@ flowchart LR
 	cf -->|Origin: S3 Website Endpoint| s3www[S3 Bucket: www.davidugba.com]
 	cf -->|Origin: S3 Website Endpoint| s3root[S3 Bucket: davidugba.com]
 	r53[Route 53 Hosted Zone] -->|A/AAAA records| cf
-	acm[ACM Certificate (us-east-1)] -->|TLS| cf
+	acm[ACM Certificate] -->|TLS| cf
 ```
 
 Mermaid source: docs/architecture.mmd
