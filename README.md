@@ -4,13 +4,6 @@ Production AWS website infrastructure for davidugba.com managed with Terraform.
 
 ## Architecture
 
-![Architecture Diagram (PNG)](docs/architecture.png)
-
-*Figure 1: AWS infrastructure architecture for davidugba.com*
-
-<details>
-<summary>📐 View Mermaid source code (editable)</summary>
-
 ```mermaid
 flowchart LR
 	user[User Browser] -->|HTTPS| cf[CloudFront Distribution]
