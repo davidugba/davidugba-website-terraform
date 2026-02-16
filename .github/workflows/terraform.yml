@@ -46,6 +46,16 @@ jobs:
         terraform import aws_s3_bucket_policy.website www.davidugba.com || true
         terraform import aws_s3_bucket_policy.root davidugba.com || true
         
+        echo "🔄 Importing CloudFront distribution..."
+        # Import your existing CloudFront distribution
+        terraform import aws_cloudfront_distribution.website ESM0NFF9MXHK7 || echo "⚠️ CloudFront already in state or needs manual import"
+        
+        echo "🔄 Importing Route53 records..."
+        terraform import aws_route53_record.root_a Z0008153GSIISHCXKGPO_davidugba.com_A || true
+        terraform import aws_route53_record.www_a Z0008153GSIISHCXKGPO_www.davidugba.com_A || true
+        terraform import aws_route53_record.root_aaaa Z0008153GSIISHCXKGPO_davidugba.com_AAAA || true
+        terraform import aws_route53_record.www_aaaa Z0008153GSIISHCXKGPO_www.davidugba.com_AAAA || true
+        
         echo "✅ Import process completed"
       continue-on-error: true
       env:
