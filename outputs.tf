@@ -30,5 +30,5 @@ output "route53_zone_id" {
 
 output "acm_certificate_arn" {
   description = "ACM certificate ARN"
-  value       = var.acm_certificate_arn
+  value       = aws_cloudfront_distribution.website.viewer_certificate[0].acm_certificate_arn
 }

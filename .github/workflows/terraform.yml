@@ -59,7 +59,6 @@ jobs:
         echo "✅ Import process completed"
       continue-on-error: true
       env:
-        TF_VAR_acm_certificate_arn: ${{ secrets.TF_VAR_acm_certificate_arn }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: "eu-north-1"
@@ -67,7 +66,6 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -input=false
       env:
-        TF_VAR_acm_certificate_arn: ${{ secrets.TF_VAR_acm_certificate_arn }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: "eu-north-1"
@@ -76,7 +74,6 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
       env:
-        TF_VAR_acm_certificate_arn: ${{ secrets.TF_VAR_acm_certificate_arn }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: "eu-north-1"
