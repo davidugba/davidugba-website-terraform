@@ -28,6 +28,32 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
+    - name: Terraform Import Existing Resources
+      run: |
+        echo "🔄 Importing existing S3 buckets..."
+        terraform import aws_s3_bucket.website www.davidugba.com || echo "⚠️ Bucket already in state or doesn't exist"
+        terraform import aws_s3_bucket.root davidugba.com || echo "⚠️ Bucket already in state or doesn't exist"
+        
+        echo "🔄 Importing S3 bucket configurations..."
+        terraform import aws_s3_bucket_website_configuration.website www.davidugba.com || true
+        terraform import aws_s3_bucket_website_configuration.root davidugba.com || true
+        
+        echo "🔄 Importing public access blocks..."
+        terraform import aws_s3_bucket_public_access_block.website www.davidugba.com || true
+        terraform import aws_s3_bucket_public_access_block.root davidugba.com || true
+        
+        echo "🔄 Importing bucket policies..."
+        terraform import aws_s3_bucket_policy.website www.davidugba.com || true
+        terraform import aws_s3_bucket_policy.root davidugba.com || true
+        
+        echo "✅ Import process completed"
+      continue-on-error: true
+      env:
+        TF_VAR_acm_certificate_arn: ${{ secrets.TF_VAR_acm_certificate_arn }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: "eu-north-1"
+
     - name: Terraform Plan
       run: terraform plan -input=false
       env:
