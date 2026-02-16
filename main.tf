@@ -160,6 +160,12 @@ resource "aws_cloudfront_distribution" "website" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 
+  lifecycle {
+    ignore_changes = [
+      viewer_certificate[0].acm_certificate_arn,
+    ]
+  }
+
   web_acl_id = var.waf_web_acl_arn
 
   tags = {

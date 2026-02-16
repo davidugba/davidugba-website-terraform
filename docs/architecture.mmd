@@ -1,0 +1,6 @@
+flowchart LR
+  user[User Browser] -->|HTTPS| cf[CloudFront Distribution]
+  cf -->|Origin: S3 Website Endpoint| s3www[S3 Bucket: www.davidugba.com]
+  cf -->|Origin: S3 Website Endpoint| s3root[S3 Bucket: davidugba.com]
+  r53[Route 53 Hosted Zone] -->|A/AAAA records| cf
+  acm[ACM Certificate] -->|TLS| cf

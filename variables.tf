@@ -11,6 +11,7 @@ variable "waf_web_acl_arn" {
 }
 
 variable "acm_certificate_arn" {
-  description = "ARN of the ACM certificate for the domain"
+  description = "ARN of the ACM certificate for the domain (must be in us-east-1 for CloudFront)"
   type        = string
+  default     = ""
 }

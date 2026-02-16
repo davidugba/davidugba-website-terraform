@@ -58,6 +58,7 @@ terraform import aws_route53_record.www_a ZONEID_www.davidugba.com_A
 
 - State files and tfvars are ignored via .gitignore
 - Existing resources were imported before apply
+- CloudFront ACM certificate changes are ignored by Terraform to prevent accidental updates from CI misconfiguration.
 
 ## Outputs
 
