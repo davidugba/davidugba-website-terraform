@@ -26,3 +26,6 @@ terraform.rc
 # Ignore Mac/Linux system files
 .DS_Store
 Thumbs.db
+
+backend.hcl
+
