@@ -9,6 +9,70 @@ terraform {
   }
 }
 
+moved {
+  from = module.s3.aws_s3_bucket.website
+  to   = aws_s3_bucket.website
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_website_configuration.website
+  to   = aws_s3_bucket_website_configuration.website
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_public_access_block.website
+  to   = aws_s3_bucket_public_access_block.website
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_policy.website
+  to   = aws_s3_bucket_policy.website
+}
+
+moved {
+  from = module.s3.aws_s3_bucket.root
+  to   = aws_s3_bucket.root
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_website_configuration.root
+  to   = aws_s3_bucket_website_configuration.root
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_public_access_block.root
+  to   = aws_s3_bucket_public_access_block.root
+}
+
+moved {
+  from = module.s3.aws_s3_bucket_policy.root
+  to   = aws_s3_bucket_policy.root
+}
+
+moved {
+  from = module.cdn.aws_cloudfront_distribution.website
+  to   = aws_cloudfront_distribution.website
+}
+
+moved {
+  from = module.dns.aws_route53_record.root_a
+  to   = aws_route53_record.root_a
+}
+
+moved {
+  from = module.dns.aws_route53_record.www_a
+  to   = aws_route53_record.www_a
+}
+
+moved {
+  from = module.dns.aws_route53_record.root_aaaa
+  to   = aws_route53_record.root_aaaa
+}
+
+moved {
+  from = module.dns.aws_route53_record.www_aaaa
+  to   = aws_route53_record.www_aaaa
+}
 
 # Primary provider for most resources
 provider "aws" {
