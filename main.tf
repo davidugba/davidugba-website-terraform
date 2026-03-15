@@ -1,4 +1,6 @@
 terraform {
+
+  backend "s3" {}
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -6,6 +8,7 @@ terraform {
     }
   }
 }
+
 
 # Primary provider for most resources
 provider "aws" {

@@ -1,79 +1,87 @@
-name: 'Terraform CI'
+name: Terraform CI/CD
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: "1.8.5"
+  AWS_REGION: "eu-north-1"
 
 jobs:
-  terraform:
-    name: 'Terraform Validate and Plan'
+  terraform-pr-checks:
+    if: github.event_name == 'pull_request'
+    name: Terraform PR Checks
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Terraform Format
-      run: terraform fmt -check
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive
 
-    - name: Terraform Validate
-      run: terraform validate
+      - name: Terraform init
+        run: terraform init -backend-config=backend.hcl
 
-    - name: Terraform Import Existing Resources
-      run: |
-        echo "🔄 Importing existing S3 buckets..."
-        terraform import aws_s3_bucket.website www.davidugba.com || echo "⚠️ Bucket already in state or doesn't exist"
-        terraform import aws_s3_bucket.root davidugba.com || echo "⚠️ Bucket already in state or doesn't exist"
-        
-        echo "🔄 Importing S3 bucket configurations..."
-        terraform import aws_s3_bucket_website_configuration.website www.davidugba.com || true
-        terraform import aws_s3_bucket_website_configuration.root davidugba.com || true
-        
-        echo "🔄 Importing public access blocks..."
-        terraform import aws_s3_bucket_public_access_block.website www.davidugba.com || true
-        terraform import aws_s3_bucket_public_access_block.root davidugba.com || true
-        
-        echo "🔄 Importing bucket policies..."
-        terraform import aws_s3_bucket_policy.website www.davidugba.com || true
-        terraform import aws_s3_bucket_policy.root davidugba.com || true
-        
-        echo "🔄 Importing CloudFront distribution..."
-        # Import your existing CloudFront distribution
-        terraform import aws_cloudfront_distribution.website ESM0NFF9MXHK7 || echo "⚠️ CloudFront already in state or needs manual import"
-        
-        echo "🔄 Importing Route53 records..."
-        terraform import aws_route53_record.root_a Z0008153GSIISHCXKGPO_davidugba.com_A || true
-        terraform import aws_route53_record.www_a Z0008153GSIISHCXKGPO_www.davidugba.com_A || true
-        terraform import aws_route53_record.root_aaaa Z0008153GSIISHCXKGPO_davidugba.com_AAAA || true
-        terraform import aws_route53_record.www_aaaa Z0008153GSIISHCXKGPO_www.davidugba.com_AAAA || true
-        
-        echo "✅ Import process completed"
-      continue-on-error: true
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: "eu-north-1"
+      - name: Terraform validate
+        run: terraform validate
 
-    - name: Terraform Plan
-      run: terraform plan -input=false
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: "eu-north-1"
+      - name: Terraform plan
+        run: terraform plan -no-color -out=tfplan
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: "eu-north-1"
+      - name: Save readable plan
+        run: terraform show -no-color tfplan > plan.txt
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: plan.txt
+
+  terraform-apply-main:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Terraform Apply on Main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform init
+        run: terraform init -backend-config=backend.hcl
+
+      - name: Terraform plan
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
